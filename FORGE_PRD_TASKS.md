@@ -1,6 +1,6 @@
 # Forge PRD Tasks
 
-Last updated: 2026-05-15 after deployment-failure remediation, rebuild verification, standalone runtime verification, live smoke tests, and route/API audit.
+Last updated: 2026-05-15 after Prisma config migration, rebuild verification, standalone runtime verification, live smoke tests, and route/API audit.
 
 ## Foundation
 - [x] Read `PRD.md` end-to-end.
@@ -8,6 +8,7 @@ Last updated: 2026-05-15 after deployment-failure remediation, rebuild verificat
 - [x] Inspect the existing codebase before editing.
 - [x] Confirm App Router structure under `src/app`.
 - [x] Confirm `next.config.ts` uses `output: "standalone"`.
+- [x] Migrate Prisma seed config from deprecated `package.json#prisma` to `prisma.config.ts`.
 - [x] Avoid `next/font/google`; use CSS/system fonts only.
 - [x] Keep third-party SDK initialization out of module scope for Stripe and Resend call sites.
 - [x] Verify build does not depend on network-only resources.
@@ -112,6 +113,7 @@ Last updated: 2026-05-15 after deployment-failure remediation, rebuild verificat
 - [x] Production Dockerfile for standalone Next.js output.
 - [x] Dockerfile copies only directories/files that exist in this repo.
 - [x] Dockerfile includes `next-env.d.ts` for clean container TypeScript builds.
+- [x] Prisma CLI config is file-based and no longer emits the Prisma 7 deprecation warning during deploy-time seeding.
 - [x] `.dockerignore`
 - [x] README deployment notes updated for real app behavior.
 - [x] Standalone runtime uses the generated `server.js` entrypoint successfully.

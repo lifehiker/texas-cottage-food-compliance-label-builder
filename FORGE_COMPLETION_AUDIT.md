@@ -1,12 +1,13 @@
 # Forge Completion Audit
 
-Last updated: 2026-05-15 after deployment runtime fixes, standalone runtime hardening, and verification.
+Last updated: 2026-05-15 after Prisma config migration, deployment runtime verification, and standalone runtime hardening.
 
 ## Product Goal
 - Texas-specific workflow for cottage-food operators: implemented across [src/app/(marketing)/page.tsx](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/app/(marketing)/page.tsx), [src/components/product-form.tsx](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/components/product-form.tsx), [src/lib/compliance/generate-label.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/compliance/generate-label.ts), and [src/lib/compliance/generate-booth-sign.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/compliance/generate-booth-sign.ts).
 
 ## Data Model
 - Prisma schema for users, auth, subscriptions, products, export history, and site settings: [prisma/schema.prisma](/opt/forge-builds/texas-cottage-food-compliance-label-builder/prisma/schema.prisma).
+- File-based Prisma CLI config for schema path, datasource env, and seed command: [prisma.config.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/prisma.config.ts).
 - Local seed data for admin, templates, and banner: [prisma/seed.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/prisma/seed.ts).
 - Shared Prisma client with local SQLite fallback and standalone-safe SQLite path normalization: [src/lib/prisma.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/prisma.ts), [.env.example](/opt/forge-builds/texas-cottage-food-compliance-label-builder/.env.example).
 
@@ -62,10 +63,10 @@ Last updated: 2026-05-15 after deployment runtime fixes, standalone runtime hard
 - Deployment/runtime hardening for host trust, request-origin billing redirects, and standalone SQLite path resolution: [src/lib/auth-helpers.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/auth-helpers.ts), [src/lib/utils.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/utils.ts), [src/lib/prisma.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/prisma.ts).
 
 ## Verification Performed
+- `npm run seed`: passed on 2026-05-15 after migrating from deprecated `package.json#prisma` to [prisma.config.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/prisma.config.ts), and the prior Prisma 7 deprecation warning no longer appeared.
 - `npm run build`: passed on 2026-05-15.
 - `npm run lint`: passed on 2026-05-15.
-- `npm run seed`: passed on 2026-05-15.
-- `npm run dev`: started successfully on 2026-05-15 at `http://localhost:3000`.
+- `npm run dev -- --hostname 127.0.0.1 --port 3005`: started successfully on 2026-05-15 at `http://127.0.0.1:3005`.
 - `node .next/standalone/server.js`: started successfully on 2026-05-15 at `http://127.0.0.1:3100`.
 - `/api/auth/session`: returned `200` with `null` while unauthenticated, confirming the production `UntrustedHost` failure path is fixed locally.
 - Standalone runtime smoke checks: `/` returned `200`, and `/api/auth/session` returned `200` with the production-style host header plus `X-Forwarded-Proto: https`.
