@@ -64,6 +64,8 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  trustHost: true,
   providers,
   pages: {
     signIn: "/login",

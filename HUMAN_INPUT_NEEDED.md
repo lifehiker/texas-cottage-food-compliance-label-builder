@@ -23,8 +23,8 @@ These items are only needed if you want the external integrations to run in live
 
 ## NextAuth Production Settings
 - Provide a production `AUTH_SECRET` or `NEXTAUTH_SECRET` value.
-- Provide the correct production app URL in env if your deployment platform requires it for auth callbacks.
+- Provide the correct production app URL in `NEXT_PUBLIC_APP_URL`, `AUTH_URL`, or `NEXTAUTH_URL` so canonical metadata, sitemap URLs, and auth callbacks use your real domain.
 
 ## Docker Verification
-- Docker daemon access was not available in this environment, so `docker build .` could not be run here.
+- Docker is installed in this environment, but the daemon socket was not accessible here, so `docker build .` could not be run from this session.
 - If you have Docker access, run `docker build .` from the repo root to verify the container image on your target machine.

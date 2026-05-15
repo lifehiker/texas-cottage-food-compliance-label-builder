@@ -1,6 +1,6 @@
 # Forge PRD Tasks
 
-Last updated: 2026-05-15 after final implementation, build verification, live dev smoke tests, and route/API audit.
+Last updated: 2026-05-15 after deployment-failure remediation, rebuild verification, standalone runtime verification, live smoke tests, and route/API audit.
 
 ## Foundation
 - [x] Read `PRD.md` end-to-end.
@@ -11,6 +11,7 @@ Last updated: 2026-05-15 after final implementation, build verification, live de
 - [x] Avoid `next/font/google`; use CSS/system fonts only.
 - [x] Keep third-party SDK initialization out of module scope for Stripe and Resend call sites.
 - [x] Verify build does not depend on network-only resources.
+- [x] Normalize local SQLite runtime paths so standalone output and Prisma CLI use the same database file.
 
 ## Data Model
 - [x] `User` model.
@@ -26,6 +27,7 @@ Last updated: 2026-05-15 after final implementation, build verification, live de
 
 ## Auth
 - [x] NextAuth v5 setup.
+- [x] Trust deployed hosts for Auth.js runtime requests.
 - [x] Prisma adapter wiring.
 - [x] Credentials login flow.
 - [x] Registration API with password hashing.
@@ -99,6 +101,7 @@ Last updated: 2026-05-15 after final implementation, build verification, live de
 ## Billing / Email / Storage Integrations Or Safe Fallbacks
 - [x] Stripe checkout with local-plan fallback when Stripe keys are absent.
 - [x] Stripe billing portal with local redirect fallback.
+- [x] Runtime billing redirects derive the request origin instead of hard-coding `localhost`.
 - [x] Stripe webhook no-op fallback when webhook secret is absent.
 - [x] Resend helper with logged no-op fallback.
 - [x] Analytics helper with safe local behavior.
@@ -111,13 +114,18 @@ Last updated: 2026-05-15 after final implementation, build verification, live de
 - [x] Dockerfile includes `next-env.d.ts` for clean container TypeScript builds.
 - [x] `.dockerignore`
 - [x] README deployment notes updated for real app behavior.
+- [x] Standalone runtime uses the generated `server.js` entrypoint successfully.
 - [ ] `docker build .` verified if daemon access is available.
 
 ## Verification
 - [x] `npm install`
+- [x] Normalize unreadable local package permissions that blocked `next build` from reading installed dependencies.
+- [x] `npm run seed`
 - [x] `npm run build`
 - [x] `npm run lint`
 - [x] Start dev server successfully.
+- [x] Smoke-test `/api/auth/session` to confirm no `UntrustedHost` runtime failure.
+- [x] Smoke-test standalone `node .next/standalone/server.js`.
 - [x] Smoke-test anonymous marketing routes.
 - [x] Smoke-test auth redirect to `/login`.
 - [x] Smoke-test registration flow.
@@ -142,4 +150,4 @@ Last updated: 2026-05-15 after final implementation, build verification, live de
 - [x] QA
 
 ## Remaining Constraint
-- [ ] Docker daemon access was not available in this environment, so `docker build .` could not be executed locally despite the Dockerfile being prepared for standalone output.
+- [ ] The Docker CLI is installed here, but the daemon socket is not accessible in this environment, so `docker build .` could not be executed locally despite the Dockerfile being prepared for standalone output.

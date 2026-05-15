@@ -4,8 +4,13 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
-export function absoluteUrl(path = "/") {
-  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+export function absoluteUrl(path = "/", baseOverride?: string) {
+  const base =
+    baseOverride ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.AUTH_URL ||
+    process.env.NEXTAUTH_URL ||
+    "http://localhost:3000";
   return new URL(path, base).toString();
 }
 

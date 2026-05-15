@@ -15,6 +15,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Plan is required." }, { status: 400 });
   }
 
+  const requestOrigin = new URL(request.url).origin;
+
   const stripe = getStripe();
   if (!stripe) {
     await prisma.subscription.upsert({
@@ -23,7 +25,7 @@ export async function POST(request: Request) {
       create: { userId: session.user.id, plan, source: "LOCAL", status: "ACTIVE" },
     });
 
-    return NextResponse.json({ url: absoluteUrl("/app?upgrade=local") });
+    return NextResponse.json({ url: absoluteUrl("/app?upgrade=local", requestOrigin) });
   }
 
   const priceId = getPriceIdForPlan(plan);
@@ -35,8 +37,8 @@ export async function POST(request: Request) {
     customer_email: session.user.email || undefined,
     mode: "subscription",
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: absoluteUrl("/app?upgrade=success"),
-    cancel_url: absoluteUrl("/pricing?upgrade=cancelled"),
+    success_url: absoluteUrl("/app?upgrade=success", requestOrigin),
+    cancel_url: absoluteUrl("/pricing?upgrade=cancelled", requestOrigin),
     metadata: {
       userId: session.user.id,
       plan,

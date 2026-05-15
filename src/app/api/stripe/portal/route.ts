@@ -4,11 +4,13 @@ import { absoluteUrl } from "@/lib/utils";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
-export async function POST() {
+export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   }
+
+  const requestOrigin = new URL(request.url).origin;
 
   const subscription = await prisma.subscription.findUnique({
     where: { userId: session.user.id },
@@ -16,12 +18,12 @@ export async function POST() {
 
   const stripe = getStripe();
   if (!stripe || !subscription?.stripeCustomerId) {
-    return NextResponse.json({ url: absoluteUrl("/pricing?billing=local") });
+    return NextResponse.json({ url: absoluteUrl("/pricing?billing=local", requestOrigin) });
   }
 
   const portal = await stripe.billingPortal.sessions.create({
     customer: subscription.stripeCustomerId,
-    return_url: absoluteUrl("/app"),
+    return_url: absoluteUrl("/app", requestOrigin),
   });
 
   return NextResponse.json({ url: portal.url });

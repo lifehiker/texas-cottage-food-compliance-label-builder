@@ -20,7 +20,7 @@ export default async function PricingPage() {
         Free is for trying the workflow. Starter and Pro are for sellers who repeatedly print labels, signs, and ingredient pages throughout market season.
       </p>
       <div className="mt-8">
-        <PricingCards currentPlan={session?.user.plan} signedIn={Boolean(session?.user)} />
+        <PricingCards currentPlan={session?.user?.plan} signedIn={Boolean(session?.user)} />
       </div>
       <div className="mt-8">
         <SourceNotice />

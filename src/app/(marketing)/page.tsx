@@ -90,7 +90,7 @@ export default async function HomePage() {
             Full pricing →
           </Link>
         </div>
-        <PricingCards currentPlan={session?.user.plan} signedIn={Boolean(session?.user)} />
+        <PricingCards currentPlan={session?.user?.plan} signedIn={Boolean(session?.user)} />
       </section>
     </div>
   );

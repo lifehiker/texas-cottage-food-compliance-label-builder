@@ -1,6 +1,6 @@
 # Forge Completion Audit
 
-Last updated: 2026-05-15.
+Last updated: 2026-05-15 after deployment runtime fixes, standalone runtime hardening, and verification.
 
 ## Product Goal
 - Texas-specific workflow for cottage-food operators: implemented across [src/app/(marketing)/page.tsx](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/app/(marketing)/page.tsx), [src/components/product-form.tsx](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/components/product-form.tsx), [src/lib/compliance/generate-label.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/compliance/generate-label.ts), and [src/lib/compliance/generate-booth-sign.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/compliance/generate-booth-sign.ts).
@@ -8,10 +8,10 @@ Last updated: 2026-05-15.
 ## Data Model
 - Prisma schema for users, auth, subscriptions, products, export history, and site settings: [prisma/schema.prisma](/opt/forge-builds/texas-cottage-food-compliance-label-builder/prisma/schema.prisma).
 - Local seed data for admin, templates, and banner: [prisma/seed.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/prisma/seed.ts).
-- Shared Prisma client with local SQLite fallback: [src/lib/prisma.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/prisma.ts), [.env.example](/opt/forge-builds/texas-cottage-food-compliance-label-builder/.env.example).
+- Shared Prisma client with local SQLite fallback and standalone-safe SQLite path normalization: [src/lib/prisma.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/prisma.ts), [.env.example](/opt/forge-builds/texas-cottage-food-compliance-label-builder/.env.example).
 
 ## Auth
-- NextAuth configuration, session shaping, optional Google provider, and credentials auth: [src/lib/auth-helpers.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/auth-helpers.ts), [src/auth.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/auth.ts), [src/app/api/auth/[...nextauth]/route.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/app/api/auth/[...nextauth]/route.ts).
+- NextAuth configuration, trusted-host runtime handling, session shaping, optional Google provider, and credentials auth: [src/lib/auth-helpers.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/auth-helpers.ts), [src/auth.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/auth.ts), [src/app/api/auth/[...nextauth]/route.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/app/api/auth/[...nextauth]/route.ts).
 - Registration route with password hashing, default subscription creation, analytics, and email fallback: [src/app/api/register/route.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/app/api/register/route.ts).
 - Auth UI and protected dashboard layout: [src/components/auth-forms.tsx](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/components/auth-forms.tsx), [src/app/app/layout.tsx](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/app/app/layout.tsx).
 
@@ -48,20 +48,27 @@ Last updated: 2026-05-15.
 ## Billing / Email / Fallback Behavior
 - Plan entitlements: [src/lib/billing/entitlements.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/billing/entitlements.ts), [src/lib/constants.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/constants.ts).
 - Stripe lazy initialization and price lookup: [src/lib/stripe.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/stripe.ts).
+- Request-origin aware absolute URL generation for billing redirects and return URLs: [src/lib/utils.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/utils.ts), [src/app/api/stripe/checkout/route.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/app/api/stripe/checkout/route.ts), [src/app/api/stripe/portal/route.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/app/api/stripe/portal/route.ts).
 - Resend lazy initialization with no-op fallback: [src/lib/email.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/email.ts).
 - Analytics safe fallback: [src/lib/analytics.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/analytics.ts).
 - Update-banner persistence fallback through DB-backed site settings: [src/lib/site-settings.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/site-settings.ts).
+- Update-banner read path gracefully falls back when the SQLite file or `SiteSetting` table is unavailable during first boot or prerender: [src/lib/site-settings.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/site-settings.ts).
 
 ## Deployment
 - Standalone Next.js config: [next.config.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/next.config.ts).
-- Production Dockerfile: [Dockerfile](/opt/forge-builds/texas-cottage-food-compliance-label-builder/Dockerfile).
+- Production Dockerfile with standalone output and trusted-host runtime env: [Dockerfile](/opt/forge-builds/texas-cottage-food-compliance-label-builder/Dockerfile).
 - Docker ignore file: [.dockerignore](/opt/forge-builds/texas-cottage-food-compliance-label-builder/.dockerignore).
 - Local/deploy documentation: [README.md](/opt/forge-builds/texas-cottage-food-compliance-label-builder/README.md).
+- Deployment/runtime hardening for host trust, request-origin billing redirects, and standalone SQLite path resolution: [src/lib/auth-helpers.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/auth-helpers.ts), [src/lib/utils.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/utils.ts), [src/lib/prisma.ts](/opt/forge-builds/texas-cottage-food-compliance-label-builder/src/lib/prisma.ts).
 
 ## Verification Performed
 - `npm run build`: passed on 2026-05-15.
 - `npm run lint`: passed on 2026-05-15.
+- `npm run seed`: passed on 2026-05-15.
 - `npm run dev`: started successfully on 2026-05-15 at `http://localhost:3000`.
+- `node .next/standalone/server.js`: started successfully on 2026-05-15 at `http://127.0.0.1:3100`.
+- `/api/auth/session`: returned `200` with `null` while unauthenticated, confirming the production `UntrustedHost` failure path is fixed locally.
+- Standalone runtime smoke checks: `/` returned `200`, and `/api/auth/session` returned `200` with the production-style host header plus `X-Forwarded-Proto: https`.
 - Anonymous smoke checks: `/`, `/pricing`, `/login`, `/texas-cottage-food-law`, `/texas-cottage-food-label-template`, `/texas-cottage-food-sign-requirements`, `/where-can-you-sell-cottage-food-in-texas` all returned `200`.
 - Protected-route smoke check: `/app` redirected to `/login?next=/app` when unauthenticated.
 - Authenticated smoke flow:
