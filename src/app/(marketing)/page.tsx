@@ -17,7 +17,12 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch {
+    // auth() can throw on transient DB or NextAuth errors; fall back to unauthenticated UI
+  }
   const example = marketingPages.label.exampleProduct;
   const softwareSchema = {
     "@context": "https://schema.org",
