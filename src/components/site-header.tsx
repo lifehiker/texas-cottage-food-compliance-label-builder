@@ -11,7 +11,12 @@ const navLinks = [
 ];
 
 export async function SiteHeader() {
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch {
+    // auth() can throw on transient DB or NextAuth errors; fall back to unauthenticated UI
+  }
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/80 bg-[rgba(251,244,234,0.88)] backdrop-blur">
