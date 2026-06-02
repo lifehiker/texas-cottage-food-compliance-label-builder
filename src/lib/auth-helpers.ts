@@ -81,21 +81,25 @@ export const authConfig: NextAuthConfig = {
         return token;
       }
 
-      const dbUser = await prisma.user.findUnique({
-        where: { id: userId },
-        include: { subscription: true },
-      });
+      try {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: userId },
+          include: { subscription: true },
+        });
 
-      if (!dbUser) {
-        return token;
+        if (!dbUser) {
+          return token;
+        }
+
+        token.sub = dbUser.id;
+        token.role = dbUser.role;
+        token.plan = dbUser.subscription?.plan ?? "FREE";
+        token.name = dbUser.name;
+        token.email = dbUser.email;
+        token.picture = dbUser.image;
+      } catch {
+        // DB error: return token as-is so auth() does not throw and callers can fall back gracefully
       }
-
-      token.sub = dbUser.id;
-      token.role = dbUser.role;
-      token.plan = dbUser.subscription?.plan ?? "FREE";
-      token.name = dbUser.name;
-      token.email = dbUser.email;
-      token.picture = dbUser.image;
 
       return token;
     },
