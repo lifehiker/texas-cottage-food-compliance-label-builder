@@ -82,10 +82,14 @@ export const authConfig: NextAuthConfig = {
       }
 
       try {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: userId },
-          include: { subscription: true },
-        });
+        const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
+        const dbUser = await Promise.race([
+          prisma.user.findUnique({
+            where: { id: userId },
+            include: { subscription: true },
+          }),
+          timeout,
+        ]);
 
         if (!dbUser) {
           return token;

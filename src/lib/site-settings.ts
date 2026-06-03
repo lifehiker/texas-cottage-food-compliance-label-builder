@@ -5,10 +5,11 @@ const DEFAULT_BANNER =
 
 export async function getUpdateBanner() {
   try {
-    const setting = await prisma.siteSetting.findUnique({
-      where: { key: "updateBanner" },
-    });
-
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000));
+    const setting = await Promise.race([
+      prisma.siteSetting.findUnique({ where: { key: "updateBanner" } }),
+      timeout,
+    ]);
     return setting?.value || DEFAULT_BANNER;
   } catch {
     return DEFAULT_BANNER;
