@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <div className="container-shell py-16">
-      <Suspense fallback={null}>
+      <Suspense fallback={<p className="text-sm text-muted">Loading…</p>}>
         <AuthForms googleEnabled={Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)} />
       </Suspense>
     </div>
