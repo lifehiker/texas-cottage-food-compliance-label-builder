@@ -13,7 +13,8 @@ const navLinks = [
 export async function SiteHeader() {
   let session = null;
   try {
-    session = await auth();
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
+    session = await Promise.race([auth(), timeout]);
   } catch {
     // auth() can throw on transient DB or NextAuth errors; fall back to unauthenticated UI
   }
