@@ -10,7 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default async function PricingPage() {
-  const session = await auth();
+  let session = null;
+  try {
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000));
+    session = await Promise.race([auth(), timeout]);
+  } catch {
+    // auth() can throw on transient DB or NextAuth errors; fall back to unauthenticated UI
+  }
 
   return (
     <div className="container-shell py-14">
