@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { AuthForms } from "@/components/auth-forms";
 
 export const metadata: Metadata = {
@@ -8,12 +7,18 @@ export const metadata: Metadata = {
     "Sign in to save Texas cottage food product records, export labels and booth signs, and manage your compliance workspace.",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
   return (
     <div className="container-shell py-16">
-      <Suspense fallback={<p className="text-sm text-muted">Loading…</p>}>
-        <AuthForms googleEnabled={Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)} />
-      </Suspense>
+      <AuthForms
+        googleEnabled={Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)}
+        next={next ?? "/app"}
+      />
     </div>
   );
 }

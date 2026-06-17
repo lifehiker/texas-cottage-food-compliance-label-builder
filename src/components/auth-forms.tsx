@@ -2,12 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button, Surface } from "@/components/ui";
 
-export function AuthForms({ googleEnabled }: { googleEnabled: boolean }) {
+export function AuthForms({ googleEnabled, next }: { googleEnabled: boolean; next: string }) {
   const router = useRouter();
-  const params = useSearchParams();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -16,7 +15,6 @@ export function AuthForms({ googleEnabled }: { googleEnabled: boolean }) {
     const email = String(formData.get("email") || "");
     const password = String(formData.get("password") || "");
     const name = String(formData.get("name") || "");
-    const next = params.get("next") || "/app";
 
     startTransition(async () => {
       if (mode === "register") {
@@ -78,7 +76,7 @@ export function AuthForms({ googleEnabled }: { googleEnabled: boolean }) {
         <Button
           className="mt-4 w-full"
           variant="outline"
-          onClick={() => signIn("google", { callbackUrl: params.get("next") || "/app" })}
+          onClick={() => signIn("google", { callbackUrl: next })}
         >
           Continue with Google
         </Button>
