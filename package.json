@@ -44,6 +44,7 @@
     "typescript": "^5"
   },
   "overrides": {
+    "@auth/core": "0.41.3",
     "next": {
       "postcss": "8.5.10"
     },
